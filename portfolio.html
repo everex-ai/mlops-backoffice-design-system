@@ -1,0 +1,1309 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>EverEx Backoffice Design System — Portfolio</title>
+    <meta
+      name="description"
+      content="EverEx 혁신실 백오피스 디자인 시스템의 철학과 전체 컴포넌트를 한 눈에 확인할 수 있는 단일 페이지"
+    />
+
+    <!-- Pretendard Variable -->
+    <link
+      rel="stylesheet"
+      as="style"
+      crossorigin="anonymous"
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+    />
+
+    <!-- Tailwind CDN (v3 config API) -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+
+    <!-- Lucide icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+
+    <style type="text/tailwindcss">
+      /* ==========================================================
+       * EverEx 디자인 토큰 — tokens/globals.css의 HSL 변수를 그대로
+       * 복사했습니다. 이 페이지는 실제 디자인 시스템이 적용된 상태를
+       * 브라우저에서 보여주는 단일 파일 데모입니다.
+       * ========================================================== */
+      @layer base {
+        :root {
+          --background: 220 16% 96%;
+          --foreground: 220 20% 10%;
+          --card: 0 0% 100%;
+          --card-foreground: 220 20% 10%;
+          --popover: 0 0% 100%;
+          --popover-foreground: 220 20% 10%;
+          --primary: 173 55% 36%;
+          --primary-foreground: 0 0% 100%;
+          --secondary: 220 14% 93%;
+          --secondary-foreground: 220 20% 14%;
+          --muted: 220 14% 93%;
+          --muted-foreground: 220 8% 46%;
+          --accent: 220 14% 93%;
+          --accent-foreground: 220 20% 14%;
+          --destructive: 0 72% 51%;
+          --destructive-foreground: 0 0% 100%;
+          --border: 220 13% 89%;
+          --input: 220 13% 87%;
+          --ring: 173 55% 36%;
+          --radius: 0.5rem;
+          /* Chart palette (5색) */
+          --chart-1: 173 55% 36%;
+          --chart-2: 142 55% 42%;
+          --chart-3: 213 70% 50%;
+          --chart-4: 38 92% 50%;
+          --chart-5: 280 60% 55%;
+        }
+
+        .dark {
+          --background: 224 14% 8%;
+          --foreground: 220 10% 90%;
+          --card: 224 12% 11%;
+          --card-foreground: 220 10% 90%;
+          --popover: 224 12% 11%;
+          --popover-foreground: 220 10% 90%;
+          --primary: 173 50% 42%;
+          --primary-foreground: 0 0% 100%;
+          --secondary: 220 10% 16%;
+          --secondary-foreground: 220 10% 90%;
+          --muted: 220 10% 15%;
+          --muted-foreground: 220 8% 50%;
+          --accent: 220 10% 16%;
+          --accent-foreground: 220 10% 90%;
+          --destructive: 0 62% 40%;
+          --destructive-foreground: 0 0% 100%;
+          --border: 220 10% 18%;
+          --input: 220 10% 20%;
+          --ring: 173 50% 42%;
+          --chart-1: 173 50% 42%;
+          --chart-2: 142 50% 48%;
+          --chart-3: 213 65% 60%;
+          --chart-4: 38 88% 60%;
+          --chart-5: 280 55% 65%;
+        }
+
+        * {
+          border-color: hsl(var(--border));
+        }
+        html {
+          /* [EverEx] 스크롤바가 있든 없든 좌우 여백이 동일해 보이도록 양쪽에
+             gutter를 예약합니다. 스크롤바 폭(약 15px)이 우측에만 나타나 헤더와
+             메인이 비대칭으로 보이던 문제를 해결합니다. */
+          scrollbar-gutter: stable both-edges;
+        }
+        body {
+          background: hsl(var(--background));
+          color: hsl(var(--foreground));
+          font-family: "Pretendard Variable", Pretendard, -apple-system,
+            BlinkMacSystemFont, "system-ui", Roboto, sans-serif;
+          -webkit-font-smoothing: antialiased;
+        }
+      }
+
+      @layer utilities {
+        .animate-fade-in-up {
+          animation: fadeInUp 0.4s ease-out;
+        }
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(8px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        /* Token-based scrollbar (globals.css와 동일) */
+        .scrollbar-thin::-webkit-scrollbar {
+          width: 8px;
+          height: 8px;
+        }
+        .scrollbar-thin::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .scrollbar-thin::-webkit-scrollbar-thumb {
+          background: hsl(var(--border));
+          border-radius: 4px;
+        }
+        .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+          background: hsl(var(--muted-foreground) / 0.4);
+        }
+      }
+    </style>
+
+    <script>
+      // Tailwind v3 config: EverEx 토큰을 Tailwind 색상으로 매핑
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              background: "hsl(var(--background))",
+              foreground: "hsl(var(--foreground))",
+              card: {
+                DEFAULT: "hsl(var(--card))",
+                foreground: "hsl(var(--card-foreground))",
+              },
+              popover: {
+                DEFAULT: "hsl(var(--popover))",
+                foreground: "hsl(var(--popover-foreground))",
+              },
+              primary: {
+                DEFAULT: "hsl(var(--primary))",
+                foreground: "hsl(var(--primary-foreground))",
+              },
+              secondary: {
+                DEFAULT: "hsl(var(--secondary))",
+                foreground: "hsl(var(--secondary-foreground))",
+              },
+              muted: {
+                DEFAULT: "hsl(var(--muted))",
+                foreground: "hsl(var(--muted-foreground))",
+              },
+              accent: {
+                DEFAULT: "hsl(var(--accent))",
+                foreground: "hsl(var(--accent-foreground))",
+              },
+              destructive: {
+                DEFAULT: "hsl(var(--destructive))",
+                foreground: "hsl(var(--destructive-foreground))",
+              },
+              border: "hsl(var(--border))",
+              input: "hsl(var(--input))",
+              ring: "hsl(var(--ring))",
+              chart: {
+                1: "hsl(var(--chart-1))",
+                2: "hsl(var(--chart-2))",
+                3: "hsl(var(--chart-3))",
+                4: "hsl(var(--chart-4))",
+                5: "hsl(var(--chart-5))",
+              },
+            },
+            borderRadius: {
+              lg: "var(--radius)",
+              md: "calc(var(--radius) - 2px)",
+              sm: "calc(var(--radius) - 4px)",
+            },
+            fontFamily: {
+              sans: [
+                "Pretendard Variable",
+                "Pretendard",
+                "-apple-system",
+                "BlinkMacSystemFont",
+                "system-ui",
+                "Roboto",
+                "sans-serif",
+              ],
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+
+  <body class="min-h-screen">
+    <!-- ======================================================================
+         Header — 49px 고정 sticky blur (DS 필수 스펙)
+         ====================================================================== -->
+    <header class="sticky top-0 z-20">
+      <div
+        class="border-b border-border bg-background/95 backdrop-blur-sm supports-[backdrop-filter]:bg-background/80"
+      >
+        <div
+          class="mx-auto max-w-7xl px-6 md:px-8 py-2.5 flex justify-between items-center"
+        >
+          <div class="flex items-center gap-2.5 shrink-0">
+            <img
+              src="./assets/everex-logo-icon.png"
+              alt="EverEx"
+              width="22"
+              height="22"
+              class="shrink-0"
+            />
+            <h1
+              class="text-base font-semibold text-foreground tracking-tight whitespace-nowrap"
+            >
+              EverEx Design System
+            </h1>
+            <span
+              class="ml-2 text-[10px] font-medium uppercase tracking-wider text-muted-foreground border border-border rounded-sm px-1.5 py-0.5"
+              >Portfolio</span
+            >
+          </div>
+
+          <nav class="hidden md:flex items-center gap-1 text-sm">
+            <a
+              href="#philosophy"
+              class="px-3 py-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+              >철학</a
+            >
+            <a
+              href="#tokens"
+              class="px-3 py-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+              >토큰</a
+            >
+            <a
+              href="#components"
+              class="px-3 py-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+              >컴포넌트</a
+            >
+            <a
+              href="#layout"
+              class="px-3 py-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+              >레이아웃</a
+            >
+            <a
+              href="#hooks"
+              class="px-3 py-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+              >훅</a
+            >
+          </nav>
+
+          <div class="flex items-center gap-1.5">
+            <button
+              id="theme-toggle"
+              aria-label="테마 전환"
+              class="inline-flex items-center justify-center w-9 h-9 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-all active:scale-[0.97]"
+            >
+              <i data-lucide="sun" class="w-4 h-4 dark:hidden"></i>
+              <i data-lucide="moon" class="w-4 h-4 hidden dark:block"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-7xl px-6 md:px-8 py-10 animate-fade-in-up space-y-24">
+      <!-- ======================================================================
+           HERO
+           ====================================================================== -->
+      <section class="pt-6 pb-8">
+        <div class="max-w-3xl">
+          <div
+            class="inline-flex items-center gap-2 text-xs font-medium text-primary bg-primary/10 rounded-full px-3 py-1 mb-6"
+          >
+            <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+            v1 · 2026
+          </div>
+          <h2
+            class="text-4xl md:text-5xl font-bold tracking-tight text-foreground mb-5"
+          >
+            혁신실 백오피스의 공용 디자인 언어
+          </h2>
+          <p class="text-lg text-muted-foreground leading-relaxed mb-8">
+            VideoLab에서 검증된 디자인 토큰과 패턴을 추출한 <strong
+              class="text-foreground font-semibold">Next.js + shadcn/ui 참조
+              팩</strong>입니다. AI-Crawler, Compass, Label Supporter, Video
+            Annotator가 같은 한국어-우선 UI와 틸(Teal) 아이덴티티를 공유합니다.
+          </p>
+          <div class="flex flex-wrap gap-3">
+            <a
+              href="#philosophy"
+              class="inline-flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-md text-sm font-medium shadow-sm hover:bg-primary/90 transition-all active:scale-[0.97]"
+            >
+              3대 원칙 보기
+              <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </a>
+            <a
+              href="#components"
+              class="inline-flex items-center gap-2 border border-border bg-card text-foreground px-4 py-2 rounded-md text-sm font-medium shadow-sm hover:bg-muted transition-all active:scale-[0.97]"
+            >
+              컴포넌트 살펴보기
+            </a>
+          </div>
+        </div>
+
+        <div
+          class="mt-10 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl"
+        >
+          <div class="bg-card border rounded-lg p-4 shadow-sm">
+            <div class="text-3xl font-bold text-primary tabular-nums">49</div>
+            <div class="text-xs text-muted-foreground mt-1">px · 헤더 고정 높이</div>
+          </div>
+          <div class="bg-card border rounded-lg p-4 shadow-sm">
+            <div class="text-3xl font-bold text-primary tabular-nums">173°</div>
+            <div class="text-xs text-muted-foreground mt-1">Teal · Primary HSL</div>
+          </div>
+          <div class="bg-card border rounded-lg p-4 shadow-sm">
+            <div class="text-3xl font-bold text-primary tabular-nums">4</div>
+            <div class="text-xs text-muted-foreground mt-1">서비스 공통 사용</div>
+          </div>
+          <div class="bg-card border rounded-lg p-4 shadow-sm">
+            <div class="text-3xl font-bold text-primary" style="font-family: 'Pretendard Variable', sans-serif;">가Aa</div>
+            <div class="text-xs text-muted-foreground mt-1">Pretendard · 한국어 우선</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======================================================================
+           PHILOSOPHY
+           ====================================================================== -->
+      <section id="philosophy">
+        <div class="mb-8">
+          <p class="text-xs font-semibold uppercase tracking-wider text-primary mb-2">
+            Philosophy
+          </p>
+          <h3 class="text-2xl font-bold tracking-tight">3대 원칙</h3>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-5">
+          <div
+            class="bg-card border rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow duration-200"
+          >
+            <div
+              class="w-10 h-10 rounded-md bg-primary/10 text-primary flex items-center justify-center mb-4"
+            >
+              <i data-lucide="layers" class="w-5 h-5"></i>
+            </div>
+            <h4 class="font-semibold mb-2">시맨틱 토큰 First</h4>
+            <p class="text-sm text-muted-foreground leading-relaxed">
+              raw hex, <code
+                class="text-[11px] bg-muted rounded px-1 py-0.5 font-mono">slate-*</code>,
+              <code
+                class="text-[11px] bg-muted rounded px-1 py-0.5 font-mono">bg-white</code>는
+              금지입니다. 모든 색상은 CSS 변수 기반 시맨틱 토큰으로 표현하며
+              라이트/다크는 변수 swap만으로 전환됩니다.
+            </p>
+          </div>
+
+          <div
+            class="bg-card border rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow duration-200"
+          >
+            <div
+              class="w-10 h-10 rounded-md bg-primary/10 text-primary flex items-center justify-center mb-4"
+            >
+              <i data-lucide="languages" class="w-5 h-5"></i>
+            </div>
+            <h4 class="font-semibold mb-2">한국어 우선</h4>
+            <p class="text-sm text-muted-foreground leading-relaxed">
+              Pretendard Variable을 표준으로 합니다. Inter는 채택하지 않으며
+              문서도 <strong
+                class="text-foreground">한국어 본문 + 영문 기술 용어</strong>
+              혼용을 따릅니다. 번역하지 않습니다.
+            </p>
+          </div>
+
+          <div
+            class="bg-card border rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow duration-200"
+          >
+            <div
+              class="w-10 h-10 rounded-md bg-primary/10 text-primary flex items-center justify-center mb-4"
+            >
+              <i data-lucide="lock" class="w-5 h-5"></i>
+            </div>
+            <h4 class="font-semibold mb-2">Cross-Service 고정 스펙</h4>
+            <p class="text-sm text-muted-foreground leading-relaxed">
+              헤더 49px, 로그인 split 레이아웃, Primary 173° 틸, Pretendard —
+              이 네 가지는 서비스 간 계약입니다. 바꾸려면 versioning 결정이
+              필요합니다.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======================================================================
+           TOKENS — 색상, 타이포, 레이어
+           ====================================================================== -->
+      <section id="tokens">
+        <div class="mb-8">
+          <p class="text-xs font-semibold uppercase tracking-wider text-primary mb-2">
+            Tokens
+          </p>
+          <h3 class="text-2xl font-bold tracking-tight">디자인 토큰</h3>
+          <p class="text-sm text-muted-foreground mt-2">
+            모든 값은 <code
+              class="text-[11px] bg-muted rounded px-1 py-0.5 font-mono">tokens/globals.css</code>의
+            HSL 변수입니다. 다크모드 전환은 <code
+              class="text-[11px] bg-muted rounded px-1 py-0.5 font-mono">.dark</code>
+            클래스만으로 처리됩니다.
+          </p>
+        </div>
+
+        <!-- 시맨틱 팔레트 -->
+        <div class="mb-10">
+          <h4 class="text-sm font-semibold text-muted-foreground mb-4 uppercase tracking-wider">
+            시맨틱 팔레트
+          </h4>
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+            <!-- background -->
+            <div class="border rounded-lg overflow-hidden shadow-sm">
+              <div class="h-20 bg-background border-b"></div>
+              <div class="p-3">
+                <div class="text-sm font-medium">background</div>
+                <div class="text-[11px] font-mono text-muted-foreground mt-0.5">
+                  220 16% 96%
+                </div>
+              </div>
+            </div>
+            <!-- card -->
+            <div class="border rounded-lg overflow-hidden shadow-sm">
+              <div class="h-20 bg-card border-b"></div>
+              <div class="p-3">
+                <div class="text-sm font-medium">card</div>
+                <div class="text-[11px] font-mono text-muted-foreground mt-0.5">
+                  0 0% 100%
+                </div>
+              </div>
+            </div>
+            <!-- primary -->
+            <div class="border rounded-lg overflow-hidden shadow-sm">
+              <div class="h-20 bg-primary"></div>
+              <div class="p-3">
+                <div class="text-sm font-medium">primary</div>
+                <div class="text-[11px] font-mono text-muted-foreground mt-0.5">
+                  173 55% 36%
+                </div>
+              </div>
+            </div>
+            <!-- secondary -->
+            <div class="border rounded-lg overflow-hidden shadow-sm">
+              <div class="h-20 bg-secondary"></div>
+              <div class="p-3">
+                <div class="text-sm font-medium">secondary</div>
+                <div class="text-[11px] font-mono text-muted-foreground mt-0.5">
+                  220 14% 93%
+                </div>
+              </div>
+            </div>
+            <!-- muted -->
+            <div class="border rounded-lg overflow-hidden shadow-sm">
+              <div class="h-20 bg-muted"></div>
+              <div class="p-3">
+                <div class="text-sm font-medium">muted</div>
+                <div class="text-[11px] font-mono text-muted-foreground mt-0.5">
+                  220 14% 93%
+                </div>
+              </div>
+            </div>
+            <!-- destructive -->
+            <div class="border rounded-lg overflow-hidden shadow-sm">
+              <div class="h-20 bg-destructive"></div>
+              <div class="p-3">
+                <div class="text-sm font-medium">destructive</div>
+                <div class="text-[11px] font-mono text-muted-foreground mt-0.5">
+                  0 72% 51%
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 차트 팔레트 -->
+        <div class="mb-10">
+          <h4 class="text-sm font-semibold text-muted-foreground mb-4 uppercase tracking-wider">
+            차트 팔레트 (chart-1 ~ 5)
+          </h4>
+          <div class="grid grid-cols-5 gap-3 max-w-2xl">
+            <div class="text-center">
+              <div class="h-14 rounded-md bg-chart-1 mb-2"></div>
+              <div class="text-xs font-medium">chart-1</div>
+            </div>
+            <div class="text-center">
+              <div class="h-14 rounded-md bg-chart-2 mb-2"></div>
+              <div class="text-xs font-medium">chart-2</div>
+            </div>
+            <div class="text-center">
+              <div class="h-14 rounded-md bg-chart-3 mb-2"></div>
+              <div class="text-xs font-medium">chart-3</div>
+            </div>
+            <div class="text-center">
+              <div class="h-14 rounded-md bg-chart-4 mb-2"></div>
+              <div class="text-xs font-medium">chart-4</div>
+            </div>
+            <div class="text-center">
+              <div class="h-14 rounded-md bg-chart-5 mb-2"></div>
+              <div class="text-xs font-medium">chart-5</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 타이포그래피 -->
+        <div class="mb-10">
+          <h4
+            class="text-sm font-semibold text-muted-foreground mb-4 uppercase tracking-wider"
+          >
+            타이포그래피 · Pretendard Variable
+          </h4>
+          <div class="bg-card border rounded-lg divide-y">
+            <div class="p-5 flex items-baseline justify-between gap-6 flex-wrap">
+              <div class="text-4xl font-bold tracking-tight">
+                혁신실 백오피스 디자인 시스템
+              </div>
+              <div class="text-xs font-mono text-muted-foreground shrink-0">
+                text-4xl · font-bold
+              </div>
+            </div>
+            <div class="p-5 flex items-baseline justify-between gap-6 flex-wrap">
+              <div class="text-2xl font-bold tracking-tight">섹션 제목 Heading 2</div>
+              <div class="text-xs font-mono text-muted-foreground shrink-0">
+                text-2xl · font-bold
+              </div>
+            </div>
+            <div class="p-5 flex items-baseline justify-between gap-6 flex-wrap">
+              <div class="text-base font-semibold">소제목 · Subheading</div>
+              <div class="text-xs font-mono text-muted-foreground shrink-0">
+                text-base · font-semibold
+              </div>
+            </div>
+            <div class="p-5 flex items-baseline justify-between gap-6 flex-wrap">
+              <div class="text-sm text-foreground">
+                본문 텍스트입니다. Pretendard는 한국어와 영문의 x-height를 맞춰 혼용
+                문장에서도 일관된 리듬을 만듭니다.
+              </div>
+              <div class="text-xs font-mono text-muted-foreground shrink-0">
+                text-sm
+              </div>
+            </div>
+            <div class="p-5 flex items-baseline justify-between gap-6 flex-wrap">
+              <div class="text-xs text-muted-foreground">
+                캡션 · muted-foreground · meta 정보
+              </div>
+              <div class="text-xs font-mono text-muted-foreground shrink-0">
+                text-xs · text-muted-foreground
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 엘리베이션 -->
+        <div>
+          <h4 class="text-sm font-semibold text-muted-foreground mb-4 uppercase tracking-wider">
+            엘리베이션 (3 레이어)
+          </h4>
+          <div class="grid md:grid-cols-3 gap-4">
+            <!-- Layer 0 — 배경이 실제로 "페이지 배경"과 동일하다는 걸 보여주려고
+                 카드 모양을 빼고 dashed border만 둡니다. -->
+            <div class="bg-background border border-dashed rounded-lg p-5 relative">
+              <div class="text-xs font-semibold text-muted-foreground mb-1">
+                Layer 0
+              </div>
+              <div class="font-medium mb-2">페이지 배경</div>
+              <code class="text-[11px] font-mono text-muted-foreground">bg-background</code>
+            </div>
+            <div class="bg-card border rounded-lg p-5 shadow-sm">
+              <div class="text-xs font-semibold text-muted-foreground mb-1">
+                Layer 1
+              </div>
+              <div class="font-medium mb-2">카드/패널</div>
+              <code class="text-[11px] font-mono text-muted-foreground">bg-card · shadow-sm</code>
+            </div>
+            <div class="bg-popover border rounded-lg p-5 shadow-xl ring-1 ring-border/60">
+              <div class="text-xs font-semibold text-muted-foreground mb-1">
+                Layer 2
+              </div>
+              <div class="font-medium mb-2">팝오버/드롭다운</div>
+              <code class="text-[11px] font-mono text-muted-foreground">bg-popover · shadow-xl</code>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======================================================================
+           COMPONENTS
+           ====================================================================== -->
+      <section id="components">
+        <div class="mb-8">
+          <p class="text-xs font-semibold uppercase tracking-wider text-primary mb-2">
+            Components
+          </p>
+          <h3 class="text-2xl font-bold tracking-tight">컴포넌트</h3>
+          <p class="text-sm text-muted-foreground mt-2">
+            shadcn/ui 오버라이드와 EverEx 고유 추가 컴포넌트. 모두 시맨틱
+            토큰만으로 구성됩니다.
+          </p>
+        </div>
+
+        <!-- Button -->
+        <div class="mb-10">
+          <div class="flex items-baseline justify-between mb-3">
+            <h4 class="font-semibold">Button</h4>
+            <span class="text-xs font-mono text-muted-foreground">components/button.tsx</span>
+          </div>
+          <div class="bg-card border rounded-lg p-6 shadow-sm">
+            <div class="flex flex-wrap gap-3 items-center">
+              <button
+                class="inline-flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-md text-sm font-medium shadow-sm hover:bg-primary/90 transition-all active:scale-[0.97]"
+              >
+                Primary
+              </button>
+              <button
+                class="inline-flex items-center gap-2 bg-secondary text-secondary-foreground px-4 py-2 rounded-md text-sm font-medium shadow-sm hover:bg-secondary/80 transition-all active:scale-[0.97]"
+              >
+                Secondary
+              </button>
+              <button
+                class="inline-flex items-center gap-2 border border-border bg-card text-foreground px-4 py-2 rounded-md text-sm font-medium shadow-sm hover:bg-muted transition-all active:scale-[0.97]"
+              >
+                Outline
+              </button>
+              <button
+                class="inline-flex items-center gap-2 text-foreground px-4 py-2 rounded-md text-sm font-medium hover:bg-muted transition-all active:scale-[0.97]"
+              >
+                Ghost
+              </button>
+              <button
+                class="inline-flex items-center gap-2 bg-destructive text-destructive-foreground px-4 py-2 rounded-md text-sm font-medium shadow-sm hover:bg-destructive/90 transition-all active:scale-[0.97]"
+              >
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                Destructive
+              </button>
+              <button
+                class="inline-flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-md text-sm font-medium shadow-sm opacity-50 cursor-not-allowed"
+                disabled
+              >
+                Disabled
+              </button>
+            </div>
+            <p class="text-xs text-muted-foreground mt-4 border-t pt-4">
+              <span class="font-mono">active:scale-[0.97]</span> +
+              <span class="font-mono">transition-all</span> — 눌렀을 때 살짝
+              들어가는 마이크로 인터랙션이 EverEx의 버튼 시그니처입니다.
+            </p>
+          </div>
+        </div>
+
+        <!-- Card -->
+        <div class="mb-10">
+          <div class="flex items-baseline justify-between mb-3">
+            <h4 class="font-semibold">Card</h4>
+            <span class="text-xs font-mono text-muted-foreground">components/card.tsx</span>
+          </div>
+          <div class="grid md:grid-cols-3 gap-4">
+            <div
+              class="bg-card border rounded-lg p-5 shadow-sm hover:shadow-md transition-shadow duration-200"
+            >
+              <div class="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+                작업 진행
+              </div>
+              <div class="text-2xl font-bold mb-1 tabular-nums">342 / 500</div>
+              <div class="h-1.5 bg-muted rounded-full overflow-hidden">
+                <div class="h-full bg-primary w-[68%]"></div>
+              </div>
+            </div>
+            <div
+              class="bg-card border rounded-lg p-5 shadow-sm hover:shadow-md transition-shadow duration-200"
+            >
+              <div class="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+                평균 처리 시간
+              </div>
+              <div class="text-2xl font-bold mb-1 tabular-nums">12.4초</div>
+              <div class="text-xs text-chart-2">
+                ▲ 전주 대비 3.2% 개선
+              </div>
+            </div>
+            <div
+              class="bg-card border rounded-lg p-5 shadow-sm hover:shadow-md transition-shadow duration-200"
+            >
+              <div class="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+                오류율
+              </div>
+              <div class="text-2xl font-bold mb-1 tabular-nums">0.8%</div>
+              <div class="text-xs text-muted-foreground">
+                최근 24시간
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Badges + Status -->
+        <div class="mb-10">
+          <div class="flex items-baseline justify-between mb-3">
+            <h4 class="font-semibold">Badge · StatusBadge</h4>
+            <span class="text-xs font-mono text-muted-foreground">components/status-badge.tsx</span>
+          </div>
+          <div class="bg-card border rounded-lg p-6 shadow-sm flex flex-wrap gap-2">
+            <span class="inline-flex items-center rounded-md bg-primary text-primary-foreground px-2 py-0.5 text-xs font-medium">
+              Default
+            </span>
+            <span class="inline-flex items-center rounded-md bg-secondary text-secondary-foreground px-2 py-0.5 text-xs font-medium">
+              Secondary
+            </span>
+            <span class="inline-flex items-center rounded-md border text-foreground px-2 py-0.5 text-xs font-medium">
+              Outline
+            </span>
+            <span class="inline-flex items-center rounded-md bg-destructive text-destructive-foreground px-2 py-0.5 text-xs font-medium">
+              Destructive
+            </span>
+            <span class="inline-flex items-center gap-1 rounded-md bg-chart-2/15 text-chart-2 border border-chart-2/20 px-2 py-0.5 text-xs font-medium">
+              <i data-lucide="check" class="w-3 h-3"></i>
+              완료
+            </span>
+            <span class="inline-flex items-center gap-1 rounded-md bg-chart-4/15 text-chart-4 border border-chart-4/20 px-2 py-0.5 text-xs font-medium">
+              <i data-lucide="clock" class="w-3 h-3"></i>
+              대기
+            </span>
+            <span class="inline-flex items-center gap-1 rounded-md bg-destructive/10 text-destructive border border-destructive/20 px-2 py-0.5 text-xs font-medium">
+              <i data-lucide="x" class="w-3 h-3"></i>
+              실패
+            </span>
+          </div>
+        </div>
+
+        <!-- StepIndicator -->
+        <div class="mb-10">
+          <div class="flex items-baseline justify-between mb-3">
+            <h4 class="font-semibold">StepIndicator — 다단계 워크플로우</h4>
+            <span class="text-xs font-mono text-muted-foreground">components/step-indicator.tsx</span>
+          </div>
+          <div class="bg-card border rounded-lg p-6 shadow-sm space-y-6 max-w-md">
+            <!-- active -->
+            <div class="space-y-1.5">
+              <div class="flex items-center gap-1">
+                <div class="w-5 h-5 rounded-full flex items-center justify-center bg-chart-2 text-primary-foreground">
+                  <i data-lucide="check" class="w-3 h-3"></i>
+                </div>
+                <div class="w-3 h-0.5 mx-0.5 bg-chart-2"></div>
+                <div class="w-5 h-5 rounded-full flex items-center justify-center bg-primary text-primary-foreground ring-2 ring-primary/30 ring-offset-1 ring-offset-background animate-pulse text-[10px] font-medium">
+                  2
+                </div>
+                <div class="w-3 h-0.5 mx-0.5 bg-muted"></div>
+                <div class="w-5 h-5 rounded-full flex items-center justify-center bg-muted text-muted-foreground text-[10px] font-medium">
+                  3
+                </div>
+                <div class="w-3 h-0.5 mx-0.5 bg-muted"></div>
+                <div class="w-5 h-5 rounded-full flex items-center justify-center bg-muted text-muted-foreground text-[10px] font-medium">
+                  4
+                </div>
+              </div>
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="text-xs font-medium text-foreground whitespace-nowrap">크롤링 중</span>
+                <span class="text-xs text-muted-foreground whitespace-nowrap tabular-nums">
+                  342 / 500 files
+                </span>
+              </div>
+              <div class="h-1.5 bg-muted rounded-full overflow-hidden">
+                <div class="h-full bg-primary w-[68%]"></div>
+              </div>
+            </div>
+
+            <!-- failed -->
+            <div class="space-y-1.5">
+              <div class="flex items-center gap-1">
+                <div class="w-5 h-5 rounded-full flex items-center justify-center bg-chart-2 text-primary-foreground">
+                  <i data-lucide="check" class="w-3 h-3"></i>
+                </div>
+                <div class="w-3 h-0.5 mx-0.5 bg-chart-2"></div>
+                <div class="w-5 h-5 rounded-full flex items-center justify-center bg-destructive text-destructive-foreground">
+                  <i data-lucide="x" class="w-3 h-3"></i>
+                </div>
+                <div class="w-3 h-0.5 mx-0.5 bg-muted"></div>
+                <div class="w-5 h-5 rounded-full flex items-center justify-center bg-muted text-muted-foreground text-[10px] font-medium">
+                  3
+                </div>
+                <div class="w-3 h-0.5 mx-0.5 bg-muted"></div>
+                <div class="w-5 h-5 rounded-full flex items-center justify-center bg-muted text-muted-foreground text-[10px] font-medium">
+                  4
+                </div>
+              </div>
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="text-xs font-medium text-destructive whitespace-nowrap">파싱 실패</span>
+              </div>
+            </div>
+
+            <!-- completed -->
+            <div class="space-y-1.5">
+              <div class="flex items-center gap-1">
+                <div class="w-5 h-5 rounded-full flex items-center justify-center bg-chart-2 text-primary-foreground">
+                  <i data-lucide="check" class="w-3 h-3"></i>
+                </div>
+                <div class="w-3 h-0.5 mx-0.5 bg-chart-2"></div>
+                <div class="w-5 h-5 rounded-full flex items-center justify-center bg-chart-2 text-primary-foreground">
+                  <i data-lucide="check" class="w-3 h-3"></i>
+                </div>
+                <div class="w-3 h-0.5 mx-0.5 bg-chart-2"></div>
+                <div class="w-5 h-5 rounded-full flex items-center justify-center bg-chart-2 text-primary-foreground">
+                  <i data-lucide="check" class="w-3 h-3"></i>
+                </div>
+                <div class="w-3 h-0.5 mx-0.5 bg-chart-2"></div>
+                <div class="w-5 h-5 rounded-full flex items-center justify-center bg-chart-2 text-primary-foreground">
+                  <i data-lucide="check" class="w-3 h-3"></i>
+                </div>
+              </div>
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="text-xs font-medium text-foreground whitespace-nowrap">완료</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- LogViewer -->
+        <div class="mb-10">
+          <div class="flex items-baseline justify-between mb-3">
+            <h4 class="font-semibold">LogViewer — 자동 스크롤 로그</h4>
+            <span class="text-xs font-mono text-muted-foreground">components/log-viewer.tsx</span>
+          </div>
+          <div class="bg-card border rounded-lg p-5 shadow-sm">
+            <div class="flex items-center justify-between mb-3">
+              <h5 class="text-sm font-medium">처리 로그</h5>
+              <div
+                class="h-8 inline-flex items-center gap-2 border rounded-md px-3 text-xs bg-card"
+              >
+                전체
+                <i data-lucide="chevron-down" class="w-3 h-3"></i>
+              </div>
+            </div>
+            <div
+              class="h-[200px] overflow-y-auto scrollbar-thin rounded-md border bg-card dark:bg-background p-3 font-mono text-xs space-y-0.5"
+            >
+              <div class="flex gap-2 py-0.5">
+                <span class="text-muted-foreground shrink-0 tabular-nums">14:02:03</span>
+                <span class="inline-flex items-center rounded border px-1 py-0 h-4 shrink-0 text-[10px] bg-chart-3/15 text-chart-3 border-chart-3/20">INFO</span>
+                <span class="text-foreground">Worker claimed job:a1f3 (attempt 1/3)</span>
+              </div>
+              <div class="flex gap-2 py-0.5">
+                <span class="text-muted-foreground shrink-0 tabular-nums">14:02:05</span>
+                <span class="inline-flex items-center rounded border px-1 py-0 h-4 shrink-0 text-[10px] bg-chart-3/15 text-chart-3 border-chart-3/20">INFO</span>
+                <span class="text-foreground">Starting discovery phase for 12 seeds</span>
+              </div>
+              <div class="flex gap-2 py-0.5">
+                <span class="text-muted-foreground shrink-0 tabular-nums">14:02:11</span>
+                <span class="inline-flex items-center rounded border px-1 py-0 h-4 shrink-0 text-[10px] bg-chart-4/15 text-chart-4 border-chart-4/20">WARN</span>
+                <span class="text-foreground">Rate limit hit on host cdn.example — backoff 30s</span>
+              </div>
+              <div class="flex gap-2 py-0.5">
+                <span class="text-muted-foreground shrink-0 tabular-nums">14:02:41</span>
+                <span class="inline-flex items-center rounded border px-1 py-0 h-4 shrink-0 text-[10px] bg-chart-3/15 text-chart-3 border-chart-3/20">INFO</span>
+                <span class="text-foreground">Resumed after backoff</span>
+              </div>
+              <div class="flex gap-2 py-0.5">
+                <span class="text-muted-foreground shrink-0 tabular-nums">14:02:58</span>
+                <span class="inline-flex items-center rounded border px-1 py-0 h-4 shrink-0 text-[10px] bg-destructive/10 text-destructive border-destructive/20">ERROR</span>
+                <span class="text-foreground">Parser failed on item #142: malformed JSON response</span>
+              </div>
+              <div class="flex gap-2 py-0.5">
+                <span class="text-muted-foreground shrink-0 tabular-nums">14:03:12</span>
+                <span class="inline-flex items-center rounded border px-1 py-0 h-4 shrink-0 text-[10px] bg-muted text-muted-foreground border-border">DEBUG</span>
+                <span class="text-foreground">queue=142 inflight=8 avg_latency=184ms</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FileDropzone -->
+        <div class="mb-10">
+          <div class="flex items-baseline justify-between mb-3">
+            <h4 class="font-semibold">FileDropzone — 드래그 앤 드롭</h4>
+            <span class="text-xs font-mono text-muted-foreground">components/file-dropzone.tsx</span>
+          </div>
+          <div
+            class="relative flex flex-col items-center justify-center gap-2 min-h-[180px] w-full rounded-lg border-2 border-dashed px-6 py-10 text-center transition-colors border-border bg-muted/30 hover:bg-muted/50 cursor-pointer"
+          >
+            <i data-lucide="upload" class="h-8 w-8 text-muted-foreground"></i>
+            <p class="text-sm font-medium text-foreground">
+              파일을 드래그하여 놓거나 클릭하여 선택
+            </p>
+            <p class="text-xs text-muted-foreground">
+              이미지·비디오 · 최대 50개 · 폴더 드롭 지원
+            </p>
+          </div>
+        </div>
+
+        <!-- HighlightText -->
+        <div class="mb-10">
+          <div class="flex items-baseline justify-between mb-3">
+            <h4 class="font-semibold">HighlightText — 검색 강조</h4>
+            <span class="text-xs font-mono text-muted-foreground">components/highlight-text.tsx</span>
+          </div>
+          <div class="bg-card border rounded-lg p-6 shadow-sm space-y-2">
+            <div class="text-sm">
+              squat
+              <mark class="bg-accent text-accent-foreground rounded-sm px-0.5 font-medium">knees</mark>
+              forward lean · 검색어:
+              <code class="text-[11px] bg-muted rounded px-1 py-0.5 font-mono">knees</code>
+            </div>
+            <div class="text-sm">
+              deadlift
+              <mark class="bg-accent text-accent-foreground rounded-sm px-0.5 font-medium">row</mark>
+              progression · 검색어:
+              <code class="text-[11px] bg-muted rounded px-1 py-0.5 font-mono">row</code>
+            </div>
+            <div class="text-sm">
+              <mark class="bg-accent text-accent-foreground rounded-sm px-0.5 font-medium">squat knees</mark>
+              forward · 검색어:
+              <code class="text-[11px] bg-muted rounded px-1 py-0.5 font-mono">squat-knees</code>
+              <span class="text-xs text-muted-foreground ml-1">(하이픈 ⇄ 공백 등가)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="mb-10">
+          <div class="flex items-baseline justify-between mb-3">
+            <h4 class="font-semibold">Pagination</h4>
+            <span class="text-xs font-mono text-muted-foreground">components/pagination.tsx</span>
+          </div>
+          <div class="bg-card border rounded-lg p-6 shadow-sm max-w-md">
+            <div class="flex items-center justify-center gap-2">
+              <button class="inline-flex items-center justify-center border border-border bg-card text-foreground rounded-md h-8 w-8 shadow-sm hover:bg-muted transition-all active:scale-[0.97]">
+                <i data-lucide="chevron-left" class="w-4 h-4"></i>
+              </button>
+              <span class="text-sm text-muted-foreground tabular-nums">4 / 12</span>
+              <button class="inline-flex items-center justify-center border border-border bg-card text-foreground rounded-md h-8 w-8 shadow-sm hover:bg-muted transition-all active:scale-[0.97]">
+                <i data-lucide="chevron-right" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Spinner + Kbd + Toast -->
+        <div class="grid md:grid-cols-3 gap-4 mb-10">
+          <div>
+            <div class="flex items-baseline justify-between mb-3">
+              <h4 class="font-semibold">Spinner</h4>
+            </div>
+            <div class="bg-card border rounded-lg p-6 shadow-sm flex items-center justify-center min-h-[140px]">
+              <div class="relative">
+                <div class="absolute inset-0 rounded-full border-2 border-muted"></div>
+                <div class="w-12 h-12 rounded-full border-2 border-primary border-t-transparent animate-spin"></div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="flex items-baseline justify-between mb-3">
+              <h4 class="font-semibold">Kbd</h4>
+            </div>
+            <div class="bg-card border rounded-lg p-6 shadow-sm flex items-center justify-center min-h-[140px] gap-1 flex-wrap">
+              <kbd class="bg-muted text-muted-foreground inline-flex h-6 min-w-[1.5rem] select-none items-center justify-center rounded-sm px-1.5 font-sans text-xs font-medium border">
+                ⌘
+              </kbd>
+              <kbd class="bg-muted text-muted-foreground inline-flex h-6 min-w-[1.5rem] select-none items-center justify-center rounded-sm px-1.5 font-sans text-xs font-medium border">
+                K
+              </kbd>
+              <span class="mx-3 text-muted-foreground text-xs">또는</span>
+              <kbd class="bg-muted text-muted-foreground inline-flex h-6 min-w-[1.5rem] select-none items-center justify-center rounded-sm px-1.5 font-sans text-xs font-medium border">
+                Space
+              </kbd>
+            </div>
+          </div>
+          <div>
+            <div class="flex items-baseline justify-between mb-3">
+              <h4 class="font-semibold">Toast (Sonner)</h4>
+            </div>
+            <div class="bg-card border rounded-lg p-6 shadow-sm min-h-[140px] flex items-center justify-center">
+              <div class="bg-popover text-popover-foreground border rounded-lg px-4 py-3 shadow-lg flex items-center gap-3 w-full max-w-sm">
+                <i data-lucide="check-circle-2" class="w-5 h-5 text-chart-2 shrink-0"></i>
+                <div>
+                  <div class="text-sm font-medium">클립보드에 복사되었습니다!</div>
+                  <div class="text-xs text-muted-foreground">top-center · 토큰 기반</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TableSkeleton + Empty -->
+        <div class="grid md:grid-cols-2 gap-4">
+          <div>
+            <div class="flex items-baseline justify-between mb-3">
+              <h4 class="font-semibold">TableSkeleton</h4>
+            </div>
+            <div class="bg-card border rounded-lg overflow-hidden shadow-sm">
+              <div class="p-4 border-b flex justify-between items-center">
+                <div class="h-4 bg-muted rounded w-1/3 animate-pulse"></div>
+                <div class="h-8 bg-muted rounded w-20 animate-pulse"></div>
+              </div>
+              <div class="divide-y">
+                <div class="p-4 flex gap-4">
+                  <div class="h-4 bg-muted rounded w-1/4 animate-pulse"></div>
+                  <div class="h-4 bg-muted rounded w-1/3 animate-pulse"></div>
+                  <div class="h-4 bg-muted rounded w-1/5 animate-pulse"></div>
+                </div>
+                <div class="p-4 flex gap-4">
+                  <div class="h-4 bg-muted rounded w-1/3 animate-pulse"></div>
+                  <div class="h-4 bg-muted rounded w-1/4 animate-pulse"></div>
+                  <div class="h-4 bg-muted rounded w-1/3 animate-pulse"></div>
+                </div>
+                <div class="p-4 flex gap-4">
+                  <div class="h-4 bg-muted rounded w-1/5 animate-pulse"></div>
+                  <div class="h-4 bg-muted rounded w-1/3 animate-pulse"></div>
+                  <div class="h-4 bg-muted rounded w-1/4 animate-pulse"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="flex items-baseline justify-between mb-3">
+              <h4 class="font-semibold">EmptyState</h4>
+            </div>
+            <div class="bg-card border rounded-lg shadow-sm">
+              <div class="text-center py-12 px-6">
+                <div class="mb-4 flex justify-center">
+                  <div class="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
+                    <i data-lucide="inbox" class="w-6 h-6 text-muted-foreground"></i>
+                  </div>
+                </div>
+                <h3 class="text-lg font-semibold mb-2">아직 생성된 작업이 없어요</h3>
+                <p class="text-sm text-muted-foreground mb-4">
+                  새 작업을 만들어 수집을 시작해보세요.
+                </p>
+                <button
+                  class="inline-flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-md text-sm font-medium shadow-sm hover:bg-primary/90 transition-all active:scale-[0.97]"
+                >
+                  <i data-lucide="plus" class="w-4 h-4"></i>
+                  작업 만들기
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======================================================================
+           LAYOUT
+           ====================================================================== -->
+      <section id="layout">
+        <div class="mb-8">
+          <p class="text-xs font-semibold uppercase tracking-wider text-primary mb-2">
+            Layout
+          </p>
+          <h3 class="text-2xl font-bold tracking-tight">레이아웃</h3>
+          <p class="text-sm text-muted-foreground mt-2">
+            헤더 49px와 로그인 split 레이아웃은 모든 서비스에서 동일해야 하는 고정
+            스펙입니다.
+          </p>
+        </div>
+
+        <!-- Header mock -->
+        <div class="mb-8">
+          <div class="flex items-baseline justify-between mb-3">
+            <h4 class="font-semibold">Header · 49px sticky blur</h4>
+            <span class="text-xs font-mono text-muted-foreground">layout/Header.tsx</span>
+          </div>
+          <div class="border rounded-lg overflow-hidden shadow-sm">
+            <div
+              class="border-b border-border bg-background/95 backdrop-blur-sm h-[49px] flex items-center px-4 justify-between"
+            >
+              <div class="flex items-center gap-2.5">
+                <img src="./assets/everex-logo-icon.png" alt="EverEx" width="22" height="22" />
+                <h1 class="text-base font-semibold tracking-tight">AI-Crawler</h1>
+                <nav class="hidden sm:flex items-center gap-1 ml-4">
+                  <span class="px-2 py-1 rounded-md text-xs text-foreground bg-muted">Jobs</span>
+                  <span class="px-2 py-1 rounded-md text-xs text-muted-foreground">Workers</span>
+                  <span class="px-2 py-1 rounded-md text-xs text-muted-foreground">Stats</span>
+                </nav>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <div class="w-8 h-8 rounded-md bg-muted"></div>
+                <div class="w-8 h-8 rounded-md bg-muted"></div>
+              </div>
+            </div>
+            <div class="bg-muted/30 text-center text-xs text-muted-foreground py-2 border-b">
+              ↑ 높이 49px (py-2.5 + border-b) — 사이드바 min-h-[calc(100vh-49px)]가 이 값에 의존
+            </div>
+          </div>
+        </div>
+
+        <!-- LoginPage split mock -->
+        <div>
+          <div class="flex items-baseline justify-between mb-3">
+            <h4 class="font-semibold">LoginPage · Split 레이아웃</h4>
+            <span class="text-xs font-mono text-muted-foreground">layout/LoginPage.tsx</span>
+          </div>
+          <div class="border rounded-lg overflow-hidden shadow-sm">
+            <div class="grid md:grid-cols-2 min-h-[340px]">
+              <!-- Brand panel -->
+              <div class="bg-primary text-primary-foreground p-8 flex flex-col justify-between relative overflow-hidden">
+                <div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: radial-gradient(circle at 2px 2px, white 1px, transparent 0); background-size: 24px 24px;"></div>
+                <div class="relative">
+                  <div class="flex items-center gap-2 mb-4">
+                    <img
+                      src="./assets/everex-logo-icon.png"
+                      alt="EverEx"
+                      width="24"
+                      height="24"
+                      class="brightness-0 invert opacity-90"
+                    />
+                    <span class="text-sm font-semibold">EverEx</span>
+                  </div>
+                  <h4 class="text-2xl font-bold mb-2">서비스명</h4>
+                  <p class="text-sm opacity-90">서비스 설명 한 줄</p>
+                </div>
+                <p class="relative text-xs opacity-75">© 2026 EverEx · 혁신실</p>
+              </div>
+              <!-- Form panel -->
+              <div class="bg-card p-8 flex flex-col justify-center">
+                <h5 class="text-lg font-semibold mb-6">로그인</h5>
+                <button
+                  class="inline-flex items-center justify-center gap-2 border border-border bg-card text-foreground px-4 py-2 rounded-md text-sm font-medium shadow-sm hover:bg-muted transition-all active:scale-[0.97] w-full"
+                >
+                  <svg class="w-4 h-4" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+                  Google로 로그인
+                </button>
+                <p class="text-xs text-muted-foreground text-center mt-4">
+                  EverEx 계정으로만 로그인할 수 있습니다.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======================================================================
+           HOOKS / UTILITIES
+           ====================================================================== -->
+      <section id="hooks">
+        <div class="mb-8">
+          <p class="text-xs font-semibold uppercase tracking-wider text-primary mb-2">
+            Hooks · Utilities
+          </p>
+          <h3 class="text-2xl font-bold tracking-tight">훅 & 포맷터</h3>
+          <p class="text-sm text-muted-foreground mt-2">
+            세 개 이상의 서비스(video_annotator · label_supporter · AI-crawler)에서 반복적으로
+            나타난 유틸리티를 추출했습니다.
+          </p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-4">
+          <div class="bg-card border rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow duration-200">
+            <div class="flex items-center gap-2 mb-3">
+              <i data-lucide="keyboard" class="w-4 h-4 text-primary"></i>
+              <h4 class="font-semibold">useKeyboardShortcuts</h4>
+            </div>
+            <p class="text-sm text-muted-foreground mb-4 leading-relaxed">
+              <code class="text-[11px] bg-muted rounded px-1 py-0.5 font-mono">e.code</code>
+              기반 전역 단축키 훅. 한국어 IME 상태와 무관하게 물리 키 위치로 매칭됩니다.
+            </p>
+            <pre class="text-xs bg-muted/50 border rounded-md p-3 overflow-x-auto scrollbar-thin"><code>useKeyboardShortcuts([
+  { code: 'Space', handler: togglePlay, preventDefault: true },
+  { code: 'KeyJ', handler: () =&gt; seek(-5) },
+  { code: 'ArrowLeft', shift: true, handler: prevClip },
+]);</code></pre>
+          </div>
+
+          <div class="bg-card border rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow duration-200">
+            <div class="flex items-center gap-2 mb-3">
+              <i data-lucide="gauge" class="w-4 h-4 text-primary"></i>
+              <h4 class="font-semibold">useProgressStats</h4>
+            </div>
+            <p class="text-sm text-muted-foreground mb-4 leading-relaxed">
+              업로드/처리의 경과시간 · 속도 · ETA를 실시간 계산합니다.
+              <code class="text-[11px] bg-muted rounded px-1 py-0.5 font-mono">bytes</code> /
+              <code class="text-[11px] bg-muted rounded px-1 py-0.5 font-mono">items</code> /
+              <code class="text-[11px] bg-muted rounded px-1 py-0.5 font-mono">percent</code>
+              모드.
+            </p>
+            <div class="text-xs bg-muted/50 border rounded-md p-3 space-y-1 font-mono">
+              <div>
+                <span class="text-muted-foreground">elapsedTime</span> ·
+                <span class="text-foreground">1:24</span>
+              </div>
+              <div>
+                <span class="text-muted-foreground">speed</span> ·
+                <span class="text-foreground">2.4 MB/s</span>
+              </div>
+              <div>
+                <span class="text-muted-foreground">ETA</span> ·
+                <span class="text-foreground">약 42초</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-card border rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow duration-200">
+            <div class="flex items-center gap-2 mb-3">
+              <i data-lucide="clipboard" class="w-4 h-4 text-primary"></i>
+              <h4 class="font-semibold">useClipboard</h4>
+            </div>
+            <p class="text-sm text-muted-foreground mb-4 leading-relaxed">
+              <code class="text-[11px] bg-muted rounded px-1 py-0.5 font-mono">navigator.clipboard</code>
+              + 비보안 컨텍스트 폴백 + Sonner 토스트 통합.
+            </p>
+            <pre class="text-xs bg-muted/50 border rounded-md p-3 overflow-x-auto scrollbar-thin"><code>const { copyWithToast } = useClipboard();
+copyWithToast(url, 'URL이 복사됐어요');</code></pre>
+          </div>
+
+          <div class="bg-card border rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow duration-200">
+            <div class="flex items-center gap-2 mb-3">
+              <i data-lucide="timer" class="w-4 h-4 text-primary"></i>
+              <h4 class="font-semibold">useDebounce · Format utils</h4>
+            </div>
+            <p class="text-sm text-muted-foreground mb-4 leading-relaxed">
+              검색 디바운스와 범용 포맷터.
+              <code class="text-[11px] bg-muted rounded px-1 py-0.5 font-mono">formatFileSize</code>,
+              <code class="text-[11px] bg-muted rounded px-1 py-0.5 font-mono">formatETA</code>,
+              <code class="text-[11px] bg-muted rounded px-1 py-0.5 font-mono">formatByteSpeed</code>
+              등 한국어 라벨 내장.
+            </p>
+            <div class="text-xs bg-muted/50 border rounded-md p-3 space-y-1 font-mono">
+              <div>
+                formatFileSize(1536000) → <span class="text-primary">"1.46 MB"</span>
+              </div>
+              <div>
+                formatETA(45000, 5000) → <span class="text-primary">"약 45초"</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======================================================================
+           FOOTER
+           ====================================================================== -->
+      <footer class="border-t pt-10 pb-16">
+        <div class="flex items-start justify-between flex-wrap gap-6">
+          <div>
+            <div class="flex items-center gap-2.5 mb-3">
+              <img
+                src="./assets/everex-logo-icon.png"
+                alt="EverEx"
+                width="24"
+                height="24"
+              />
+              <span class="font-semibold">EverEx Backoffice Design System</span>
+            </div>
+            <p class="text-sm text-muted-foreground max-w-md leading-relaxed">
+              이 페이지는 단일 HTML 포트폴리오로, 실제 소스는
+              <code class="text-[11px] bg-muted rounded px-1 py-0.5 font-mono">components/</code>,
+              <code class="text-[11px] bg-muted rounded px-1 py-0.5 font-mono">layout/</code>,
+              <code class="text-[11px] bg-muted rounded px-1 py-0.5 font-mono">hooks/</code>,
+              <code class="text-[11px] bg-muted rounded px-1 py-0.5 font-mono">tokens/</code>
+              디렉토리에 있습니다.
+            </p>
+          </div>
+          <div class="text-sm text-muted-foreground">
+            <div class="font-medium text-foreground mb-2">문의</div>
+            <div>Liam · liam@everex.co.kr</div>
+          </div>
+        </div>
+      </footer>
+    </main>
+
+    <script>
+      // Lucide icons render
+      lucide.createIcons();
+
+      // Theme toggle — .dark 클래스 토글 (system 감지는 생략, 단순 데모)
+      const toggle = document.getElementById("theme-toggle");
+      const root = document.documentElement;
+      const saved = localStorage.getItem("everex-theme");
+      if (saved === "dark") root.classList.add("dark");
+
+      toggle.addEventListener("click", () => {
+        root.classList.toggle("dark");
+        localStorage.setItem(
+          "everex-theme",
+          root.classList.contains("dark") ? "dark" : "light",
+        );
+      });
+
+      // 스무스 스크롤
+      document.querySelectorAll('a[href^="#"]').forEach((a) => {
+        a.addEventListener("click", (e) => {
+          const id = a.getAttribute("href");
+          if (id && id.length > 1) {
+            const el = document.querySelector(id);
+            if (el) {
+              e.preventDefault();
+              el.scrollIntoView({ behavior: "smooth", block: "start" });
+            }
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

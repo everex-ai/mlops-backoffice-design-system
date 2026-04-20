@@ -1,0 +1,295 @@
+/*
+ * EverEx Backoffice Design System — Global Styles
+ * ================================================
+ * DROP-IN replacement for your project's globals.css.
+ *
+ * Usage:
+ *   1. Copy this file to your project's `src/app/globals.css`
+ *   2. Update the logo-spinner mask-image path if needed
+ *   3. Import Pretendard font (see foundations/02-typography.md)
+ *
+ * Sections:
+ *   1. Tailwind directives
+ *   2. Color tokens (light + dark)
+ *   3. Base resets (border, body, font smoothing)
+ *   4. Custom scrollbar styles (token-based)
+ *   5. Animation keyframes
+ *   6. Logo spinner styles
+ */
+
+/* ============================================
+ * 1. Tailwind Directives
+ * ============================================ */
+
+/* biome-ignore lint/suspicious/noUnknownAtRules: Tailwind CSS directive */
+@tailwind base;
+/* biome-ignore lint/suspicious/noUnknownAtRules: Tailwind CSS directive */
+@tailwind components;
+/* biome-ignore lint/suspicious/noUnknownAtRules: Tailwind CSS directive */
+@tailwind utilities;
+
+/* ============================================
+ * 2. Color Tokens
+ * ============================================
+ * All values are space-separated HSL: "H S% L%"
+ * Usage in Tailwind: hsl(var(--token))
+ *
+ * [EverEx] Primary = Teal (173°), not default shadcn slate
+ * [EverEx] Background ≠ Card (layer separation)
+ * [EverEx] Ring = Primary (not foreground)
+ */
+
+@layer base {
+  :root {
+    /* Page background — slightly tinted gray, NOT pure white */
+    --background: 220 16% 96%;
+    --foreground: 220 20% 10%;
+
+    /* Card / Panel — pure white, visually distinct from background */
+    --card: 0 0% 100%;
+    --card-foreground: 220 20% 10%;
+
+    /* Popover / Dropdown — same as card */
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 20% 10%;
+
+    /* [EverEx] Primary — Teal brand color */
+    --primary: 173 55% 36%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Secondary / Muted / Accent — neutral gray family */
+    --secondary: 220 14% 93%;
+    --secondary-foreground: 220 20% 14%;
+    --muted: 220 14% 93%;
+    --muted-foreground: 220 8% 46%;
+    --accent: 220 14% 93%;
+    --accent-foreground: 220 20% 14%;
+
+    /* Destructive — red */
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Borders & inputs */
+    --border: 220 13% 89%;
+    --input: 220 13% 87%;
+
+    /* [EverEx] Focus ring = primary (teal), not foreground */
+    --ring: 173 55% 36%;
+
+    /* Border radius base */
+    --radius: 0.5rem;
+
+    /* Chart palette (5 colors) */
+    --chart-1: 173 55% 36%;
+    --chart-2: 221 83% 53%;
+    --chart-3: 38 92% 50%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+  }
+
+  .dark {
+    --background: 224 14% 8%;
+    --foreground: 220 10% 90%;
+
+    --card: 224 12% 11%;
+    --card-foreground: 220 10% 90%;
+
+    --popover: 224 12% 11%;
+    --popover-foreground: 220 10% 90%;
+
+    /* [EverEx] Slightly brighter teal for dark mode legibility */
+    --primary: 173 50% 42%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 220 10% 16%;
+    --secondary-foreground: 220 10% 90%;
+    --muted: 220 10% 15%;
+    --muted-foreground: 220 8% 50%;
+    --accent: 220 10% 16%;
+    --accent-foreground: 220 10% 90%;
+
+    --destructive: 0 62% 40%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 10% 18%;
+    --input: 220 10% 20%;
+    --ring: 173 50% 42%;
+
+    --chart-1: 173 50% 42%;
+    --chart-2: 217 91% 60%;
+    --chart-3: 45 93% 47%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+  }
+}
+
+/* ============================================
+ * 3. Base Resets
+ * ============================================ */
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* ============================================
+ * 4. Custom Scrollbar Styles
+ * ============================================
+ * [EverEx] Uses muted-foreground token instead of hardcoded colors.
+ * Adapts automatically to light/dark mode.
+ */
+
+@layer base {
+  /* Webkit browsers (Chrome, Safari, Edge) */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground) / 0.3);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground) / 0.5);
+  }
+
+  /* Dark mode adjustments */
+  .dark ::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground) / 0.4);
+  }
+
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground) / 0.6);
+  }
+
+  /* Firefox */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--muted-foreground) / 0.3) transparent;
+  }
+
+  .dark * {
+    scrollbar-color: hsl(var(--muted-foreground) / 0.4) transparent;
+  }
+}
+
+/* ============================================
+ * 5. Animation Keyframes
+ * ============================================ */
+
+@layer utilities {
+  /* Fade in — page content entry */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  /* Fade in with slide up — card/section entry */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Table row stagger — rows slide in from left */
+  @keyframes tableRowFadeIn {
+    from {
+      opacity: 0;
+      transform: translateX(-4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  .animate-fade-in-up {
+    animation: fadeIn 0.1s ease-out forwards;
+    opacity: 0.85;
+  }
+
+  .animate-table-row {
+    opacity: 0;
+    animation: tableRowFadeIn 0.2s ease-out forwards;
+  }
+
+  /* ============================================
+   * 6. Logo Spinner Styles
+   * ============================================
+   * [CUSTOMIZE] Update the mask-image URL to your service's logo.
+   * The spinner uses a logo silhouette as a mask and fills it
+   * with the primary color via CSS gradient animation.
+   */
+
+  @keyframes logoFill {
+    0%,
+    5% {
+      background-position: 100% 0;
+    }
+    45%,
+    55% {
+      background-position: 0% 0;
+    }
+    95%,
+    100% {
+      background-position: 100% 0;
+    }
+  }
+
+  @keyframes logoPulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+
+  .logo-spinner-progress {
+    animation: logoPulse 1.5s ease-in-out infinite !important;
+    transition: background-position 0.3s ease-out;
+  }
+
+  .logo-spinner {
+    /* [CUSTOMIZE] Replace with your service's logo path */
+    -webkit-mask-image: url("/everex-logo-icon.png");
+    mask-image: url("/everex-logo-icon.png");
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    background: linear-gradient(
+      90deg,
+      hsl(var(--primary)) 0%,
+      hsl(var(--primary)) 45%,
+      hsl(var(--muted-foreground) / 0.2) 55%,
+      hsl(var(--muted-foreground) / 0.2) 100%
+    );
+    background-size: 250% 100%;
+    animation: logoFill 1.8s ease-in-out infinite;
+  }
+}
