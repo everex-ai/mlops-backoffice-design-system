@@ -89,6 +89,15 @@ const config: Config = {
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
+        // [EverEx] Chart palette — globals.css의 --chart-1~5 변수 매핑.
+        // log-viewer, step-indicator 등이 text-chart-*/bg-chart-* 클래스를 사용하므로 필수.
+        chart: {
+          '1': 'hsl(var(--chart-1))',
+          '2': 'hsl(var(--chart-2))',
+          '3': 'hsl(var(--chart-3))',
+          '4': 'hsl(var(--chart-4))',
+          '5': 'hsl(var(--chart-5))',
+        },
       },
 
       // [EverEx] CSS variable-based radius scale
