@@ -11,7 +11,7 @@
 
 ---
 
-## Quick Start (5단계)
+## Quick Start (6단계)
 
 ### 1. globals.css 교체
 
@@ -19,11 +19,26 @@
 cp tokens/globals.css your-project/src/app/globals.css
 ```
 
+> **기존 프로젝트에 적용하는 경우**: 통째로 덮어쓰지 말고 CSS 변수 섹션(`:root`, `.dark`)과 스크롤바/애니메이션 섹션만 병합하고, 프로젝트 고유 스타일은 유지하세요. ([PROMPT.md](./PROMPT.md) 2단계와 동일한 방식)
+
 ### 2. Tailwind 설정 업데이트
 
-`tokens/tailwind.config.reference.ts`를 참조하여 프로젝트의 `tailwind.config.ts`를 수정합니다. 핵심은 `fontFamily.sans`에 Pretendard를 추가하는 것입니다.
+`tokens/tailwind.config.reference.ts`를 참조하여 프로젝트의 `tailwind.config.ts`를 수정합니다. 핵심은 두 가지입니다:
 
-### 3. Pretendard 폰트 설치
+- `fontFamily.sans`에 Pretendard 추가
+- `colors`에 `chart` 매핑 추가 — 없으면 `log-viewer`, `step-indicator`의 `text-chart-*`/`bg-chart-*` 클래스가 생성되지 않아 색상이 조용히 빠집니다
+
+> Tailwind v4 프로젝트는 `tailwind.config.ts` 대신 CSS의 `@theme` 블록에 같은 값을 정의해야 합니다.
+
+### 3. 로고 에셋 복사
+
+```bash
+cp assets/*.png your-project/public/
+```
+
+`globals.css`의 `.logo-spinner`가 `/everex-logo-icon.png`를 mask 이미지로 참조하므로, 이 단계를 건너뛰면 스피너가 화면에 보이지 않습니다.
+
+### 4. Pretendard 폰트 설치
 
 ```html
 <!-- layout.tsx의 <head>에 추가 -->
@@ -35,22 +50,34 @@ cp tokens/globals.css your-project/src/app/globals.css
 />
 ```
 
-### 4. 컴포넌트 오버라이드
+### 5. 컴포넌트 오버라이드
 
 ```bash
-# 핵심 컴포넌트 복사
+# 핵심 컴포넌트 복사 (.tsx 소스만 복사 — .js/.d.ts는 복사 금지)
 cp components/button.tsx your-project/src/components/ui/
 cp components/card.tsx your-project/src/components/ui/
 cp components/sonner.tsx your-project/src/components/ui/
 ```
 
-### 5. 하드코딩 색상 제거
+복사 후 layout.tsx에 다음 두 가지를 설정해야 동작합니다:
+
+- `<Toaster position="top-center" />` 배치 (`richColors` prop은 제거 — 토큰 기반 스타일 사용)
+- next-themes의 `<ThemeProvider attribute="class" defaultTheme="system">` 래핑 (다크 모드 전환에 필요)
+
+### 6. 하드코딩 색상 제거
 
 프로젝트에서 `bg-slate-*`, `bg-white`, `text-slate-*` 등을 검색하고 시맨틱 토큰(`bg-background`, `bg-card`, `text-foreground` 등)으로 교체합니다.
 
 ---
 
 ## Table of Contents
+
+### 시작 문서
+
+| 문서 | 설명 |
+|------|------|
+| [PROMPT.md](./PROMPT.md) | 다운스트림 프로젝트에서 Claude Code에게 전달하는 적용 프롬프트 템플릿 |
+| [portfolio.html](./portfolio.html) | 브라우저에서 바로 여는 단일 파일 쇼케이스 데모 (토큰/컴포넌트/레이아웃 미리보기) |
 
 ### Foundations (디자인 원칙)
 
@@ -184,4 +211,18 @@ npm install sonner                   # Toast
 
 # Optional
 npm install framer-motion            # animated.tsx
+npm install react-resizable-panels   # resizable.tsx
 ```
+
+### 전제 조건: shadcn/ui 컴포넌트
+
+이 팩의 레퍼런스 컴포넌트들은 다음 shadcn/ui 컴포넌트가 프로젝트에 이미 설치되어 있다고 가정합니다. 없다면 `npx shadcn@latest add`로 먼저 추가하세요:
+
+| shadcn 컴포넌트 | 사용하는 파일 |
+|----------------|--------------|
+| `alert` | `layout/LoginPage.tsx` |
+| `dropdown-menu` | `layout/ThemeToggle.tsx` |
+| `tooltip`, `progress` | `components/step-indicator.tsx` |
+| `badge` | `components/status-badge.tsx`, `components/log-viewer.tsx` |
+| `select` | `components/log-viewer.tsx` |
+| `table` | `components/table-skeleton.tsx`, `examples/page-*.tsx` |
